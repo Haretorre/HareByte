@@ -22,7 +22,6 @@ Bu sayede, şifrelenmiş mesajlar sadece doğru key ile okunabilir ve üçüncü
 - 🔐 Hex + Key tabanlı **güvenli şifreleme sistemi**  
 - 🗝️ Şifre çözme ve kopyalama desteği  
 - 📜 Uzun mesajlarda bile **düzgün ve estetik** kutular  
-- 🌑 Siyah temalı, hacker-vibe bir tasarım  
 
 ---
 
