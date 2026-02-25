@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<title>HareByte</title>
+<style>
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    /* Düz siyah yerine hafif geçişli siyah degrade */
+    background: linear-gradient(to bottom, #000000, #111111); 
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 0 10px;
+}
+
+/* Header ve Bilgilendirme kutusu (sadece app ekranında) */
+.header-bar {
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    justify-content: flex-end;
+    position: relative;
+}
+
+.header-bar.hidden {
+    display: none;
+}
+
+.info-box {
+    background: rgb(255, 0, 0);
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Modal arka plan */
+.modal-bg {
+    position: fixed;
+    top:0; left:0;
+    width:100%;
+    height:100%;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+/* Modal içi */
+.modal-content {
+    background: #111;
+    padding: 20px;
+    max-width: 600px;
+    color: white;
+    border-radius: 10px;
+    text-align: left;
+}
+
+/* Geri Dön butonu */
+.modal-content button {
+    background: red;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin-top: 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Ana container */
+.container {
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    max-width: 600px;
+}
+
+.container.hidden {
+    display: none;
+}
+
+/* Başlık */
+.title {
+    color: red;
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* Butonlar */
+button.main-btn {
+    padding: 10px 20px;
+    margin: 10px;
+    border: none;
+    background: rgb(255, 0, 0);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 10px;
+}
+
+button.main-btn:hover {
+    background: darkred;
+}
+
+/* Input ve textarea */
+textarea, input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background: #111;
+    color: white;
+    border: 1px solid red;
+    border-radius: 8px;
+    box-sizing: border-box;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+/* Sonuç kutusu */
+#result {
+    margin-top: 15px;
+    padding: 10px;
+    border: 1px solid red;
+    background: #111;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    border-radius: 8px;
+    min-height: 50px;
+    width: 100%;
+    box-sizing: border-box;
+}
+</style>
+</head>
+<body>
+
+<!-- Giriş ekranı -->
+<div id="home" class="container">
+    <div class="title">HareByte'a Hoş Geldiniz</div>
+    <button class="main-btn" onclick="goNext()">Devam Et</button>
+</div>
+
+<!-- Header ve Bilgilendirme (sadece app ekranında) -->
+<div id="headerApp" class="header-bar hidden">
+    <div class="info-box" onclick="openInfo()">Bilgilendirme</div>
+</div>
+
+<!-- Mesaj ekranı -->
+<div id="app" class="container hidden">
+    <div class="title">Mesaj Sistemi</div>
+
+    <textarea id="inputText" placeholder="Mesajını yaz..."></textarea><br>
+    <input type="number" id="key" placeholder="Key (örn: 3)"><br>
+    <button class="main-btn" onclick="encrypt()">Şifrele</button>
+    <button class="main-btn" onclick="decrypt()">Çöz</button>
+    <button class="main-btn" onclick="copyResult()">Kopyala</button>
+
+    <p id="result"></p>
+</div>
+
+<!-- Modal -->
+<div class="modal-bg" id="modal">
+    <div class="modal-content">
+        <h2>HareByte Kullanım Bilgisi</h2>
+        <p>
+            Bu proje, metinleri <strong>Hex + Key</strong> tabanlı şifreleme ile güvenli şekilde kodlamanızı sağlar.
+            Kullanıcı bir <strong>mesaj</strong> yazar ve bir <strong>key</strong> numarası seçer. 
+            Key numarası arttıkça şifre daha karmaşık hale gelir. <br><br>
+            Kullanım:
+            <ul>
+                <li>Mesaj kutusuna yazınız.</li>
+                <li>Key numarasını giriniz (örn: 3).</li>
+                <li><strong>Şifrele</strong> butonuna tıklayarak metni Hex + Key ile şifreleyin.</li>
+                <li>Şifrelenmiş metni <strong>Kopyala</strong> butonu ile alabilirsiniz.</li>
+                <li>Şifreli metni çözmek için metni kutuya yapıştırın ve <strong>Çöz</strong> butonuna basın.</li>
+            </ul>
+        </p>
+        <button onclick="closeInfo()">Geri Dön</button>
+    </div>
+</div>
+
+<script>
+// Modal aç/kapa
+function openInfo() {
+    document.getElementById("modal").style.display = "flex";
+}
+function closeInfo() {
+    document.getElementById("modal").style.display = "none";
+}
+
+// Devam et
+function goNext() {
+    document.getElementById("home").classList.add("hidden");
+    document.getElementById("app").classList.remove("hidden");
+    document.getElementById("headerApp").classList.remove("hidden"); // header görünür
+}
+
+// Hex + Key şifreleme
+function encrypt() {
+    let text = document.getElementById("inputText").value;
+    let key = parseInt(document.getElementById("key").value) || 0;
+    let result = '';
+
+    for (let i = 0; i < text.length; i++) {
+        let code = text.charCodeAt(i) + key;
+        result += code.toString(16).toUpperCase() + ' ';
+    }
+
+    document.getElementById("result").innerText = result.trim();
+}
+
+// Hex + Key çözme
+function decrypt() {
+    let hex = document.getElementById("inputText").value.trim();
+    let key = parseInt(document.getElementById("key").value) || 0;
+    let result = '';
+
+    let chunks = hex.split(' ');
+    for (let i = 0; i < chunks.length; i++) {
+        let code = parseInt(chunks[i], 16) - key;
+        result += String.fromCharCode(code);
+    }
+
+    document.getElementById("result").innerText = result;
+}
+
+// Kopyala
+function copyResult() {
+    let text = document.getElementById("result").innerText;
+    if (!text) return;
+    let tempInput = document.createElement("textarea");
+    tempInput.value = text;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    tempInput.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    document.body.removeChild(tempInput);
+    alert("Mesaj kopyalandı!");
+}
+</script>
+
+</body>
+</html>
