@@ -44,4 +44,4 @@ Bu sayede, şifrelenmiş mesajlar sadece doğru key ile okunabilir ve üçüncü
 
 ---
 
-**HareByte ile mesajlarınız artık daha güvenli ve eğlenceli!** 🎉💻🔑
+**HareByte ile mesajlarınız artık daha güvenli!** 🎉💻🔑
